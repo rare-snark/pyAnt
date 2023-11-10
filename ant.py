@@ -171,9 +171,9 @@ def ant():
     agp.add_argument(
         "-f",
         "--file",
-        default="antmap.txt",
+        default="",
         type=str,
-        help='Filename of file showing the final generated path. Make blank ("") to have no output. Default: "antmap.txt"'
+        help='Filename of file showing the final generated path. Make blank ("") to have no output. Default: ""'
     )
     agp.add_argument(
         "-cs",
@@ -226,11 +226,8 @@ def ant():
                 if colony[len(colony)-1]["age"] % args.spectator_switch == 0:
                     mainCharacter = mainCharacter + 1 if mainCharacter != args.colony_size-1 else 0
             if colony[len(colony)-1]["age"] >= args.skip_iterations:
-                # for ant in colony:
-                #     printMap(mh, ant)
-                #     time.sleep(args.delay)
-                printMap(mh, colony[mainCharacter])
-                time.sleep(args.delay)
+                    printMap(mh, colony[mainCharacter])
+                    time.sleep(args.delay)
             else:
                 print("skipping iteration {}...".format(colony[len(colony)-1]["age"]))
             for ant in colony: antAct(mh, ant, colony)
