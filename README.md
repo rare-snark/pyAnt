@@ -69,6 +69,7 @@ ant.py [-h] [-d DELAY] [-si SKIP_ITERATIONS] [-f FILE] [-cs [1-10]]
 - [x] file output of final map
 - [x] multiple ants
 - [x] periodic automatic switching of spectated ant
+- [ ] reduce elif chains
 - [ ] manual switching of spectated ant
   - may be done with events
 - [ ] saving maps to file and loading from memory
