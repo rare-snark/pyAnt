@@ -17,7 +17,7 @@ import random
 #       3 = down
 
 class MapHandler:
-    def __init__(self, mapGrid):
+    def __init__(self, mapGrid: list[list[ list[list[int]]]]):
         self.mapGrid = mapGrid
         self.r = 0
         self.c = 0
@@ -46,11 +46,9 @@ def expandMapGrid(arr: list[list[ list[list[int]] ]], dir: str) -> None:
         for row in arr:
             row.insert(0, [[0] * c for i in range (r)])
     elif dir == "v":
-        # arr.append([[[0] * c for i in range (r)]] * len(arr[0]))
         arr.append([[[0] * c for i in range (r)]])
         for j in range(len(arr[0])-1): arr[len(arr)-1].append([[0] * c for i in range (r)])
     elif dir == "^":
-        # arr.insert(0, [[[0] * c for i in range (r)]] * len(arr[0]))
         arr.insert(0, [[[0] * c for i in range (r)]])
         for j in range(len(arr[1])-1): arr[0].append([[0] * c for i in range (r)])
 
@@ -90,38 +88,37 @@ def antAct(mh: MapHandler, ant: dict, colony: list[dict]) -> None:
     cLimit = len(map[0]) - 1
     gRLimit = len(mh.mapGrid)-1
     gCLimit = len(mh.mapGrid[0])-1
-    if ant["face"] == 0 and ant["c"] == cLimit:
-        ant["c"] = 0
-        if ant["gc"] + 1 > gCLimit: mh.expandMapGrid(">", colony, ant)
-        ant["gc"] += 1
-        return
-    elif ant["face"] == 1 and ant["r"] == 0:
-        ant["r"] = rLimit
-        if ant["gr"] - 1 < 0: mh.expandMapGrid("^", colony, ant)
-        else: ant["gr"] -= 1
-        return
-    elif ant["face"] == 2 and ant["c"] == 0:
-        ant["c"] = cLimit
-        if ant["gc"] - 1 < 0: mh.expandMapGrid("<", colony, ant)
-        else: ant["gc"] -= 1
-        return
-    elif ant["face"] == 3 and ant["r"] == rLimit:
-        ant["r"] = 0
-        if ant["gr"] + 1 > gRLimit: mh.expandMapGrid("v", colony, ant)
-        ant["gr"] += 1
-        return
-    #normal movement
-    elif ant["face"] == 0:
-        ant["c"] += 1
+    if ant["face"] == 0:
+        if ant["c"] == cLimit:
+            ant["c"] = 0
+            if ant["gc"] + 1 > gCLimit: mh.expandMapGrid(">", colony, ant)
+            ant["gc"] += 1
+        else:
+            ant["c"] += 1
         return
     elif ant["face"] == 1:
-        ant["r"] -= 1
+        if ant["r"] == 0:
+            ant["r"] = rLimit
+            if ant["gr"] - 1 < 0: mh.expandMapGrid("^", colony, ant)
+            else: ant["gr"] -= 1
+        else:
+            ant["r"] -= 1
         return
     elif ant["face"] == 2:
-        ant["c"] -= 1
+        if ant["c"] == 0:
+            ant["c"] = cLimit
+            if ant["gc"] - 1 < 0: mh.expandMapGrid("<", colony, ant)
+            else: ant["gc"] -= 1
+        else:
+            ant["c"] -= 1
         return
     elif ant["face"] == 3:
-        ant["r"] += 1
+        if ant["r"] == rLimit:
+            ant["r"] = 0
+            if ant["gr"] + 1 > gRLimit: mh.expandMapGrid("v", colony, ant)
+            ant["gr"] += 1
+        else:
+            ant["r"] += 1
         return
 
 def sendToFile(mh: MapHandler, fileName: str) -> None:
@@ -218,23 +215,25 @@ def ant():
             }
         )
 
-    mainCharacter = 0
+    spectated_ant = 0
+
+    writing = args.file != ""
 
     try:
         while True:
             if args.spectator_switch != 0:
                 if colony[len(colony)-1]["age"] % args.spectator_switch == 0:
-                    mainCharacter = mainCharacter + 1 if mainCharacter != args.colony_size-1 else 0
-            if colony[len(colony)-1]["age"] >= args.skip_iterations:
-                    printMap(mh, colony[mainCharacter])
+                    spectated_ant = spectated_ant + 1 if spectated_ant != args.colony_size-1 else 0
+            if colony[len(colony)-1]["age"] > args.skip_iterations:
+                    printMap(mh, colony[spectated_ant])
                     time.sleep(args.delay)
             else:
                 print("skipping iteration {}...".format(colony[len(colony)-1]["age"]))
             for ant in colony: antAct(mh, ant, colony)
-            if args.file != "": sendToFile(mh, args.file)
+            if writing: sendToFile(mh, args.file)
     except KeyboardInterrupt:
         print()
-        if args.file != "": sendToFile(mh, args.file)
+        if writing: sendToFile(mh, args.file)
         print("exiting...")
 
 
